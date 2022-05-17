@@ -1,14 +1,14 @@
 package controller
 
 import (
+	"apiaive/api/model"
 	"errors"
-	"gduvinage/api/model"
 
 	"github.com/jinzhu/gorm"
 )
 
 func GetUsers() []model.Appointment {
-	db := InitDB()
+	db := GetDb()
 	defer db.Close()
 	var users []model.Appointment
 	// SELECT * FROM users
@@ -18,7 +18,7 @@ func GetUsers() []model.Appointment {
 }
 
 func PostAppointment(jsonAppointment *model.Appointment) (*gorm.DB, error) {
-	db := InitDB()
+	db := GetDb()
 	defer db.Close()
 
 	// Si le champ est bien saisi

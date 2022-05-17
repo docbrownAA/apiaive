@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gduvinage/api"
+	"apiaive/api"
 	"log"
 	"net/http"
 )

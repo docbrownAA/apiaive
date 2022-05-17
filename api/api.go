@@ -1,9 +1,9 @@
 package api
 
 import (
+	"apiaive/api/controller"
+	"apiaive/api/model"
 	"fmt"
-	"gduvinage/api/controller"
-	"gduvinage/api/model"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
@@ -11,7 +11,7 @@ import (
 
 func Handlers() *gin.Engine {
 	router := gin.Default()
-
+	controller.InitDB()
 	userRoute := router.Group("api/users")
 	{
 		userRoute.GET("", GetUsers)
@@ -21,6 +21,13 @@ func Handlers() *gin.Engine {
 	vaccinationCenterRoute := router.Group("api/vaccination-center")
 	{
 		vaccinationCenterRoute.GET("", GetVaccinationCenters)
+	}
+
+	appointmentRoute := router.Group("api/appointment")
+	{
+		appointmentRoute.GET("", GetAppointments)
+		//A sécuriser
+		appointmentRoute.GET(":vcId", GetAppointmentsByVcId)
 	}
 
 	return router
@@ -47,5 +54,20 @@ func PostAppointment(c *gin.Context) {
 	} else {
 		// Affichage des données saisies
 		c.JSON(201, gin.H{"success": appointment})
+	}
+}
+
+func GetAppointments(c *gin.Context) {
+	appointments := controller.GetAppointments()
+	c.JSON(200, appointments)
+}
+
+func GetAppointmentsByVcId(c *gin.Context) {
+	vcId := c.Params.ByName("vcId")
+	if vcId != "" {
+		apppointments := controller.GetAppointmentsByCenterId(vcId)
+		c.JSON(200, apppointments)
+	} else {
+		c.JSON(404, gin.H{"error": "Center id not provided"})
 	}
 }

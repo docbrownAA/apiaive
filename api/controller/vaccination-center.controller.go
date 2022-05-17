@@ -1,9 +1,9 @@
 package controller
 
-import "gduvinage/api/model"
+import "apiaive/api/model"
 
 func GetVaccinationCenters() []model.VaccinationCenter {
-	db := InitDB()
+	db := GetDb()
 	defer db.Close()
 
 	var vCenters []model.VaccinationCenter
