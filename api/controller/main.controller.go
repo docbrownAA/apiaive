@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+//Init the database with fake data
 func InitDB() {
 	db, err := gorm.Open("sqlite3", "./data.db")
 	db.LogMode(true)
@@ -31,7 +32,7 @@ func InitDB() {
 		var vaccinationCenters []model.VaccinationCenter
 		db.Find(&vaccinationCenters)
 		for _, center := range vaccinationCenters {
-			app = model.Appointment{Email: "gduvinage@gmail.com", Name: "Gaël", LastName: "Duvinage", VcId: int(center.Id), Date: time.Now(), Validated: true}
+			app = model.Appointment{Email: "gduvinage@gmail.com", Name: "Gaël", LastName: "Duvinage", Vcid: int(center.Id), Date: time.Now().AddDate(0, 0, center.Id), Validated: true}
 			db.Create(&app)
 		}
 	}

@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Appointment struct {
@@ -9,9 +11,13 @@ type Appointment struct {
 	Email     string    `gorm:"not null" form:"email" json:"email"`
 	Name      string    `gorm:"not null" form:"name" json:"name"`
 	LastName  string    `gorm:"not null" form:"last_name" json:"last_name"`
-	VcId      int       `gorm:"not null" form:"vcid" json:"vcid"`
+	Vcid      int       `gorm:"not null" form:"vcid" json:"vcid"`
 	Date      time.Time `gorm:"not null" form:"date" json:"date"`
-	Validated bool      `gorm:"not null"`
+	Validated bool      `gorm:"not null default false"`
+}
+
+func (a Appointment) ToString() string {
+	return a.Email + a.Name + a.LastName + a.Date.String()
 }
 
 type VaccinationCenter struct {
@@ -20,9 +26,14 @@ type VaccinationCenter struct {
 }
 
 type Token struct {
-	Email          string    `gorm:"not null"`
-	GeneratedToken string    `gorm:"not null"`
+	GeneratedToken uuid.UUID `gorm:"not null"`
 	ValidDate      time.Time `gorm:"not null"`
+	Appid          uint      `gorm:"not null"`
+}
+
+func New(Appid uint) Token {
+	Token := Token{uuid.New(), time.Now().Add(4 * 60 * 1000), Appid}
+	return Token
 }
 
 type Admin struct {
