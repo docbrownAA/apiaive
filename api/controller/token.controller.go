@@ -16,7 +16,7 @@ import (
 func ControlToken(generatedToken string) (bool, error) {
 	db := GetDb()
 	defer db.Close()
-
+	db.LogMode(true)
 	var token model.Token
 
 	err := db.Where("generated_token = ?", generatedToken).Find(&token).Error

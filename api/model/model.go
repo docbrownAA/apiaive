@@ -32,7 +32,7 @@ type Token struct {
 }
 
 func New(Appid uint) Token {
-	Token := Token{uuid.New(), time.Now().Add(4 * 60 * 1000), Appid}
+	Token := Token{uuid.New(), time.Now().Add(time.Minute * time.Duration(10)), Appid}
 	return Token
 }
 

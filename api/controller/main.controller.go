@@ -10,6 +10,10 @@ import (
 //Init the database with fake data
 func InitDB() {
 	db, err := gorm.Open("sqlite3", "./data.db")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 	db.LogMode(true)
 
 	if !db.HasTable(&model.VaccinationCenter{}) {
@@ -46,9 +50,6 @@ func InitDB() {
 		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable((&model.Admin{}))
 	}
 
-	if err != nil {
-		panic(err)
-	}
 }
 
 func GetDb() *gorm.DB {

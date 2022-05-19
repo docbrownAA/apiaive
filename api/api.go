@@ -13,11 +13,6 @@ import (
 func Handlers() *gin.Engine {
 	router := gin.Default()
 	controller.InitDB()
-	userRoute := router.Group("api/users")
-	{
-		userRoute.GET("", GetUsers)
-		userRoute.POST("", PostAppointment)
-	}
 
 	vaccinationCenterRoute := router.Group("api/vaccination-center")
 	{
@@ -26,10 +21,11 @@ func Handlers() *gin.Engine {
 
 	appointmentRoute := router.Group("api/appointment")
 	{
+		appointmentRoute.POST("", CreateAppointment)
 		appointmentRoute.GET("", GetAppointments)
+		appointmentRoute.GET(":vcid/:date", GetAppointmentAvailables)
 		//A sécuriser
 		appointmentRoute.GET(":vcid", GetAppointmentsByVcId)
-		appointmentRoute.GET(":vcid/:date", GetAppointmentsAvaibles)
 	}
 
 	tokenRoute := router.Group("api/token")
@@ -44,7 +40,8 @@ func CheckToken(c *gin.Context) {
 	generatedToken := c.Params.ByName("token")
 	check, err := controller.ControlToken(generatedToken)
 	if err != nil {
-		c.JSON(403, gin.H{"error": err})
+		fmt.Println(err)
+		c.JSON(403, gin.H{"error": err.Error()})
 	} else {
 		c.JSON(200, gin.H{"success": check})
 	}
@@ -60,16 +57,15 @@ func GetVaccinationCenters(c *gin.Context) {
 	c.JSON(200, &vCenters)
 }
 
-func PostAppointment(c *gin.Context) {
+func CreateAppointment(c *gin.Context) {
 	var jsonAppointment model.Appointment
 	c.Bind(&jsonAppointment)
-	appointment, err := controller.PostAppointment(&jsonAppointment)
+	appointment, token, err := controller.CreateAppointment(&jsonAppointment)
 	if err != nil {
-		// Affichage de l'erreur
-		c.JSON(422, gin.H{"error": "Fields are empty"})
+		c.JSON(422, gin.H{"error": err.Error()})
 	} else {
-		// Affichage des données saisies
-		c.JSON(201, gin.H{"success": appointment})
+		//url just to have access quickly to the validation
+		c.JSON(201, gin.H{"success": appointment, "token": "http://localhost:3000/api/token/" + token.String()})
 	}
 }
 
@@ -88,14 +84,14 @@ func GetAppointmentsByVcId(c *gin.Context) {
 	}
 }
 
-func GetAppointmentsAvaibles(c *gin.Context) {
+func GetAppointmentAvailables(c *gin.Context) {
 	date := c.Params.ByName("date")
 	fmt.Println(date)
 	vcId := c.Params.ByName("vcid")
 	if date != "" && vcId != "" {
 		t, _ := time.Parse("2006-01-02T15:04:05.000Z", date)
 		fmt.Println(t)
-		appointments := controller.GetAppointmentsAvaibles(vcId, t)
+		appointments := controller.GetAppointmentAvailables(vcId, t)
 		c.JSON(200, gin.H{"success": appointments})
 	} else {
 		c.JSON(404, gin.H{"error": "date not provided"})
