@@ -9,13 +9,17 @@
 ###### create:
 
 POST localhost:3000/api/appointment/
+
+```yaml
 {
-"Name":"Gaël",
-"last_name":"Duvinage",
-"Email":"gduvinage@gmail.com",
-"Date":"2022-05-22T08:15:00+01:00",
-"vcid":2
+  "Name": "Gaël",
+  "last_name": "Duvinage",
+  "Email": "gduvinage@gmail.com",
+  "Date": "2022-05-22T08:15:00+01:00",
+  "vcid": 2,
 }
+```
+
 return the appointment + the link that we can send by email to the user
 
 ###### Get availables slots:
@@ -47,18 +51,22 @@ return the list of vaccination centers
 ###### Create an admin user
 
 POST /api/user/signup
+
+```yaml
 {
-"username":"Gael",
-"email":"gduvinage@gmail.com",
-"password":"123456",
-"vcid":2
+  "username": "Gael",
+  "email": "gduvinage@gmail.com",
+  "password": "123456",
+  "vcid": 2,
 }
+```
 
 ###### get token
 
 POST /api/user/signin
-{
-"email":"gduvinage@gmail.com",
-"password":"123456",
-}
+
+```yaml
+{ "email": "gduvinage@gmail.com", "password": "123456" }
+```
+
 return the bearer token for the secured route
