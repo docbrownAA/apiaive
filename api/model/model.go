@@ -4,10 +4,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Appointment struct {
-	Id        uint      `gorm:"primaryKey AUTO_INCREMENT"`
+	Id        int       `gorm:"primaryKey AUTO_INCREMENT"`
 	Email     string    `gorm:"not null" form:"email" json:"email"`
 	Name      string    `gorm:"not null" form:"name" json:"name"`
 	LastName  string    `gorm:"not null" form:"last_name" json:"last_name"`
@@ -21,23 +22,47 @@ func (a Appointment) ToString() string {
 }
 
 type VaccinationCenter struct {
-	Id   int    `gorm:"AUTO_INCREMENT"`
-	Name string `gorm:"not null"`
+	Id    int    `gorm:"AUTO_INCREMENT"`
+	Name  string `gorm:"not null"`
+	Slots int    `gorm:"not null"`
 }
 
-type Token struct {
+type TokenAppointment struct {
 	GeneratedToken uuid.UUID `gorm:"not null"`
 	ValidDate      time.Time `gorm:"not null"`
-	Appid          uint      `gorm:"not null"`
+	Appid          int       `gorm:"not null"`
 }
 
-func New(Appid uint) Token {
-	Token := Token{uuid.New(), time.Now().Add(time.Minute * time.Duration(10)), Appid}
+func New(Appid int) TokenAppointment {
+	Token := TokenAppointment{uuid.New(), time.Now().Add(time.Minute * time.Duration(10)), Appid}
 	return Token
 }
 
-type Admin struct {
-	UserName string `gorm:"not null"`
+type User struct {
+	UserName string `gorm:"unique;not null"`
+	Email    string `grom:"unique;not null"`
 	Password string `gorm:"not null"`
-	VcId     int    `gorm:"not null"`
+	Vcid     int    `gorm:"not null" json:"vcid"`
+}
+
+func (user *User) HashPassword(password string) error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return err
+	}
+	user.Password = string(bytes)
+	return nil
+}
+
+func (user *User) CheckPassword(providedPassword string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type TokenRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

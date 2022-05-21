@@ -4,12 +4,18 @@ import (
 	"apiaive/api/model"
 )
 
-func GetUsers() []model.Appointment {
+func RegisterUser(user *model.User) error {
 	db := GetDb()
 	defer db.Close()
-	var users []model.Appointment
-	// SELECT * FROM users
-	db.Find(&users)
-	// Affichage des données
-	return users
+	err := user.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	record := db.Create(&user).Error
+	if record != nil {
+		return record
+	}
+
+	return nil
 }

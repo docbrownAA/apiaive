@@ -19,13 +19,16 @@ func InitDB() {
 	if !db.HasTable(&model.VaccinationCenter{}) {
 		db.CreateTable(&model.VaccinationCenter{})
 		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable((&model.VaccinationCenter{}))
-		var vCenter = model.VaccinationCenter{Name: "Portet"}
+		var vCenter = model.VaccinationCenter{Name: "Portet", Slots: 2}
 		db.Create(&vCenter)
 
-		var vCenter2 = model.VaccinationCenter{Name: "Toulouse"}
+		var vCenter2 = model.VaccinationCenter{Name: "Toulouse", Slots: 4}
 		db.Create(&vCenter2)
-		var vCenter3 = model.VaccinationCenter{Name: "Lyon"}
+		var vCenter3 = model.VaccinationCenter{Name: "Lyon", Slots: 4}
 		db.Create(&vCenter3)
+
+		var vCenter4 = model.VaccinationCenter{Name: "Paris", Slots: 10}
+		db.Create(&vCenter4)
 
 	}
 
@@ -36,18 +39,19 @@ func InitDB() {
 		var vaccinationCenters []model.VaccinationCenter
 		db.Find(&vaccinationCenters)
 		for _, center := range vaccinationCenters {
-			app = model.Appointment{Email: "gduvinage@gmail.com", Name: "Gaël", LastName: "Duvinage", Vcid: int(center.Id), Date: time.Now().AddDate(0, 0, center.Id), Validated: true}
+			appDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 8+center.Id, 15, 0, 0, time.Local)
+			app = model.Appointment{Email: "gduvinage@gmail.com", Name: "Gaël", LastName: "Duvinage", Vcid: int(center.Id), Date: appDate, Validated: true}
 			db.Create(&app)
 		}
 	}
-	if !db.HasTable(&model.Token{}) {
-		db.CreateTable(&model.Token{})
-		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable((&model.Token{}))
+	if !db.HasTable(&model.TokenAppointment{}) {
+		db.CreateTable(&model.TokenAppointment{})
+		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable((&model.TokenAppointment{}))
 	}
 
-	if !db.HasTable(&model.Admin{}) {
-		db.CreateTable(&model.Admin{})
-		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable((&model.Admin{}))
+	if !db.HasTable(&model.User{}) {
+		db.CreateTable(&model.User{})
+		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable((&model.User{}))
 	}
 
 }
